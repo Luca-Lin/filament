@@ -2,8 +2,6 @@
 
 namespace Filament\Auth\MultiFactor\App;
 
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Writer;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -142,22 +140,11 @@ class AppAuthentication implements MultiFactorAuthenticationProvider
         /** @var HasAppAuthentication $user */
         $user = Filament::auth()->user();
 
-        $inlineQrCode = $this->google2FA->getQRCodeInline(
+        return $this->google2FA->getQRCodeInline(
             $this->getBrandName(),
             $this->getHolderName($user),
             $secret,
         );
-
-        // This is a fallback for when `bacon/bacon-qr-code` is installed but the `imagick` extension is not.
-        if (
-            class_exists(Writer::class)
-            && class_exists(ImageRenderer::class)
-            && (! extension_loaded('imagick'))
-        ) {
-            $inlineQrCode = 'data:image/svg+xml;base64,' . base64_encode($inlineQrCode);
-        }
-
-        return $inlineQrCode;
     }
 
     /**
